@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Box, Button } from '@mui/material';
 // Styles
 import useStyles from './styles';
-import { get as getUser } from 'redux/actions/user';
+import { getPool } from 'redux/actions/pool';
 
 export default function Home() {
     const classes = useStyles();
@@ -15,15 +15,17 @@ export default function Home() {
     const { initialized } = useContext(ContractContext);
 
     const dispatch = useDispatch();
-    const { user } = useSelector(({ user }) => ({ user }));
+    const { pool } = useSelector(({ pool }) => ({ pool }));
 
     useEffect(() => {
         if (initialized) handleGetUser();
     }, [initialized]);
 
     async function handleGetUser() {
-        dispatch(getUser());
+        dispatch(getPool());
     }
+
+    console.log(pool);
 
     return (
         <Box className={classes.root}>
