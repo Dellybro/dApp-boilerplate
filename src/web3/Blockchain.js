@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import TokenAbi from './abis/token.json';
+import TokenAbi from './abi/token.json';
 
 class BlockChain {
     static initialize({ address, chain, provider }) {
