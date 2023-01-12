@@ -1,7 +1,7 @@
 import { GET_BONDS, BONDS_ERROR } from '../reducers/bonds';
 import { ethers } from 'ethers';
 import countdown from 'utils/countdown';
-import BlockChain from 'service/blockchain';
+import BlockChain from 'web3/Blockchain';
 
 export const getBonds = () => async (dispatch, getState) => {
     const { address, contracts } = BlockChain.getInfo();
@@ -41,7 +41,7 @@ export const getBonds = () => async (dispatch, getState) => {
     const valuePerLp = (pooledETH * wethPrice + pooledGET * getPrice) / parseFloat(ethers.utils.formatUnits(_lpTotalSupply, 18));
 
     const _principleBalance = await contracts.lpPair.balanceOf(address);
-    const _allowance = await contracts.lpPair.allowance(address, contracts.lpBond.options.address);
+    const _allowance = await contracts.lpPair.allowance(address, contracts.lpBond.address);
     const _userBondInfo = await contracts.lpBond.bondInfo(address);
     const _terms = await contracts.lpBond.terms();
     const _bondPrice = await contracts.lpBond.bondPrice();
@@ -63,7 +63,7 @@ export const getBonds = () => async (dispatch, getState) => {
         lastBlockTimestamp: parseInt(_userBondInfo.lastBlockTimestamp),
         truePricePaid: _userBondInfo.truePricePaid,
         percentVested: parseInt(_percentVested),
-        address: contracts.lpBond.options.address,
+        address: contracts.lpBond.address,
     };
     userBondInfo.countdown = countdown(userBondInfo.lastBlockTimestamp + userBondInfo.vesting);
 
@@ -93,7 +93,7 @@ export const getBonds = () => async (dispatch, getState) => {
                 maxPayout: ethers.utils.formatUnits(_maxPayout, 18),
                 percentVested: _percentVested,
                 pendingPayout: _pendingPayout,
-                address: contracts.lpBond.options.address,
+                address: contracts.lpBond.address,
             },
         ],
     };
@@ -112,7 +112,7 @@ export const deposit = (value, bond) => async (dispatch) => {
     const maxPremium = ethers.utils.parseUnits(`${calcPrem.toFixed(7)}`, 7);
     const valueInWei = ethers.utils.parseUnits(value, 'ether');
 
-    if (contracts.lpBond.options.address === bond.address) {
+    if (contracts.lpBond.address === bond.address) {
         await contracts.lpBond.deposit(valueInWei, maxPremium, address).send({ from: address });
     }
 
@@ -123,7 +123,7 @@ export const redeem = (bond) => async (dispatch) => {
     const { address, contracts } = BlockChain.getInfo();
     if (!address || !contracts) throw new Error('Please connect your metamask');
 
-    if (contracts.lpBond.options.address === bond.address) {
+    if (contracts.lpBond.address === bond.address) {
         await contracts.lpBond.redeem(address).send({ from: address });
     }
 

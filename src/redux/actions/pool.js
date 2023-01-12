@@ -3,14 +3,15 @@ import { ethers } from 'ethers';
 import { metamaskErrorWrap } from 'utils/metamask-error';
 import dayjs from 'dayjs';
 
-import BlockChain from 'service/blockchain';
+import BlockChain from 'web3/Blockchain';
 
 export const getPool = () => async (dispatch) => {
     const { address, contracts } = BlockChain.getInfo();
     if (!address || !contracts) throw new Error('Please connect your metamask');
+    console.log(contracts);
 
     const _balance = await contracts.token.balanceOf(address);
-    const _allowance = await contracts.token.allowance(address, contracts.pool.options.address);
+    const _allowance = await contracts.token.allowance(address, contracts.pool.address);
     const _bonusBalance = await contracts.bonusToken.balanceOf(address);
     const _poolInfo = await contracts.pool.getPoolInfo();
     const _userPoolInfo = await contracts.pool.userInfo(address);
@@ -78,7 +79,7 @@ export const updateAllowance = () => async (dispatch, getState) => {
     if (!address || !contracts) throw new Error('Please connect your metamask');
 
     try {
-        await contracts.token.approve(contracts.pool.options.address, ethers.constants.MaxUint256).send({ from: address });
+        await contracts.token.approve(contracts.pool.address, ethers.constants.MaxUint256).send({ from: address });
 
         await dispatch(getPool());
     } catch (error) {
